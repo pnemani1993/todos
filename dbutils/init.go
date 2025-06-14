@@ -38,5 +38,6 @@ func InitializeDatabase() *sql.DB {
 		fmt.Printf("Table cannot be created or accessed %s", err)
 		os.Exit(1)
 	}
+	fmt.Println("tasks table created or already exists")
 	return dbConn
 }
