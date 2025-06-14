@@ -7,6 +7,12 @@ import (
 )
 
 func main() {
+
+	trialRun()
+	return
+}
+
+func trialRun() {
 	dbConn := dbutils.InitializeDatabase()
 	defer dbConn.Close()
 	err := dbutils.InsertData(dbConn, dbutils.TRIAL_DATA)
@@ -20,7 +26,7 @@ func main() {
 		os.Exit(1)
 	}
 	for _, row := range dbRows {
-		
+
 		fmt.Println("Row: ", row)
 	}
 	err = dbutils.DeleteData(dbConn, dbutils.DELETE_ALL_TRIAL)
@@ -28,5 +34,4 @@ func main() {
 		fmt.Println("Data was not deleted")
 		os.Exit(1)
 	}
-	return
 }

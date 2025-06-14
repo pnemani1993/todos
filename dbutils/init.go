@@ -10,6 +10,22 @@ import (
 )
 
 func InitializeDatabase() *sql.DB {
+	dbConn, err := sql.Open("sqlite3", OsDbLocation())
+	if err != nil {
+		fmt.Println("Connection cannot be established  ")
+		os.Exit(1)
+	}
+	fmt.Println("Connection established")
+	_, err = dbConn.Exec(CREATE_TABLE_LIST)
+	if err != nil {
+		fmt.Printf("Table cannot be created or accessed %s", err)
+		os.Exit(1)
+	}
+	fmt.Println("tasks table created or already exists")
+	return dbConn
+}
+
+func OsDbLocation() string {
 	os.Setenv("CGO_ENABLED", "1")
 	var pathSeparator string
 	if runtime.GOOS == "windows" {
@@ -25,19 +41,5 @@ func InitializeDatabase() *sql.DB {
 		os.Mkdir(sqlDir, 0755)
 	}
 	sqlDb := sqlDir + pathSeparator + "todos.db"
-	fmt.Println(sqlDb)
-
-	dbConn, err := sql.Open("sqlite3", sqlDb)
-	if err != nil {
-		fmt.Println("Connection cannot be established  ")
-		os.Exit(1)
-	}
-	fmt.Println("Connection established")
-	_, err = dbConn.Exec(CREATE_TABLE_LIST)
-	if err != nil {
-		fmt.Printf("Table cannot be created or accessed %s", err)
-		os.Exit(1)
-	}
-	fmt.Println("tasks table created or already exists")
-	return dbConn
+	return sqlDb
 }

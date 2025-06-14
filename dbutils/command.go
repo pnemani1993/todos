@@ -19,7 +19,63 @@ func InsertData(db *sql.DB, insertCommand string) error {
 	return nil
 }
 
-func UpdateData(db *sql.DB, updateCommand string) error {
+func UpdateDescription(db *sql.DB, description string, id uint) error {
+	updateString := fmt.Sprintf(`UPDATE tasks SET description = %s WHERE id = %d`, description, id)
+	stmt, err := db.Prepare(updateString)
+	if err != nil {
+		fmt.Println("Update statement cannot be prepared: ", err)
+		return err
+	}
+	_, err = stmt.Exec()
+	if err != nil {
+		fmt.Println("Data cannot be updated: ", err)
+		return err
+	}
+	return nil
+}
+
+func SetDone(db *sql.DB, id uint) error {
+	updateString := fmt.Sprintf(`UPDATE tasks SET done = 1, high_priority = 0 WHERE id = %d`, id)
+	stmt, err := db.Prepare(updateString)
+	if err != nil {
+		fmt.Println("Task done statement cannot be prepared: ", err)
+		return err
+	}
+	_, err = stmt.Exec()
+	if err != nil {
+		fmt.Println("Task done data cannot be updated: ", err)
+		return err
+	}
+	return nil
+}
+
+func SetHighPriority(db *sql.DB, id uint) error {
+	updateString := fmt.Sprintf(`UPDATE tasks SET high_priority = 1 WHERE id = %d`, id)
+	stmt, err := db.Prepare(updateString)
+	if err != nil {
+		fmt.Println("Task priority setting statement cannot be prepared: ", err)
+		return err
+	}
+	_, err = stmt.Exec()
+	if err != nil {
+		fmt.Println("High Priority cannot be updated: ", err)
+		return err
+	}
+	return nil
+}
+
+func RemoveHighPriority(db *sql.DB, id uint) error {
+	updateString := fmt.Sprintf(`UPDATE tasks SET high_priority = 0 WHERE id = %d`, id)
+	stmt, err := db.Prepare(updateString)
+	if err != nil {
+		fmt.Println("Task priority unsetting statement cannot be prepared: ", err)
+		return err
+	}
+	_, err = stmt.Exec()
+	if err != nil {
+		fmt.Println("High Priority cannot be unset: ", err)
+		return err
+	}
 	return nil
 }
 
@@ -50,7 +106,7 @@ func CreateNewRecordStatement(dbRow DbRow) string {
 		highPriority = 0
 	}
 
-	insertStatement := fmt.Sprintf(`INSERT INTO tasks (task, description, done, high_priority, alert) VALUES
-(%s, %s, %d, %d, %s);`, dbRow.Task, dbRow.Description, done, highPriority, dbRow.Alert.Format("2001-01-01 01:00:00"))
+	insertStatement := fmt.Sprintf(`INSERT INTO tasks (task, description, done, high_priority) VALUES
+(%s, %s, %d, %d, %s);`, dbRow.Task, dbRow.Description, done, highPriority)
 	return insertStatement
 }

@@ -11,23 +11,19 @@ type DbRow struct {
 	Done              bool
 	HighPriority      bool
 	CreationTimestamp time.Time
-	Alert             time.Time
 }
 
-func NewInsertRow(task string, description string, done bool, highPriority bool, alert time.Time) DbRow {
-	var alertTime time.Time = alert.UTC()
+func NewInsertRow(task string, description string, done bool, highPriority bool) DbRow {
 	return DbRow{
 		Task:         task,
 		Description:  description,
 		Done:         done,
 		HighPriority: highPriority,
-		Alert:        alertTime,
 	}
 
 }
-func NewResultRow(id uint, task string, description string, done bool, highPriority bool, creationTimestamp time.Time, alert time.Time) DbRow {
+func NewResultRow(id uint, task string, description string, done bool, highPriority bool, creationTimestamp time.Time) DbRow {
 	creationTimestamp = creationTimestamp.In(time.Local)
-	alert = alert.In(time.Local)
 	return DbRow{
 		Id:                id,
 		Task:              task,
@@ -35,6 +31,5 @@ func NewResultRow(id uint, task string, description string, done bool, highPrior
 		Done:              done,
 		HighPriority:      highPriority,
 		CreationTimestamp: creationTimestamp,
-		Alert:             alert,
 	}
 }

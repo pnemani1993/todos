@@ -18,16 +18,16 @@ func SelectAll(db *sql.DB) ([]DbRow, error) {
 	var id uint
 	var task, description string
 	var done, high_priority bool
-	var creation_timestamp, alert time.Time
+	var creation_timestamp time.Time
 	var dbRow []DbRow = make([]DbRow, 0)
 	for rows.Next() {
-		err := rows.Scan(&id, &task, &description, &done, &high_priority, &creation_timestamp, &alert)
+		err := rows.Scan(&id, &task, &description, &done, &high_priority, &creation_timestamp)
 		if err != nil {
 			fmt.Println("Row cannot be obtained: ", err)
 			continue
 		}
 		row := NewResultRow(id, task, description, done,
-			high_priority, creation_timestamp, alert)
+			high_priority, creation_timestamp)
 		dbRow = append(dbRow, row)
 	}
 	if len(dbRow) == 0 {
@@ -45,16 +45,16 @@ func SelectRows(db *sql.DB, selectStatement string) ([]DbRow, error) {
 	var id uint
 	var task, description string
 	var done, high_priority bool
-	var creation_timestamp, alert time.Time
+	var creation_timestamp time.Time
 	var dbRow []DbRow = make([]DbRow, 0)
 	for rows.Next() {
-		err := rows.Scan(&id, &task, &description, &done, &high_priority, &creation_timestamp, &alert)
+		err := rows.Scan(&id, &task, &description, &done, &high_priority, &creation_timestamp)
 		if err != nil {
 			fmt.Println("Row cannot be obtained: ", err)
 			continue
 		}
 		row := NewResultRow(id, task, description, done,
-			high_priority, creation_timestamp, alert)
+			high_priority, creation_timestamp)
 		dbRow = append(dbRow, row)
 	}
 	if len(dbRow) == 0 {
