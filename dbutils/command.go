@@ -5,7 +5,10 @@ import (
 	"fmt"
 )
 
-func InsertData(db *sql.DB, insertCommand string) error {
+func InsertData(db *sql.DB, dbRow DbRow) error {
+	insertCommand := fmt.Sprintf(`INSERT INTO tasks (task, description, done, high_priority) VALUES 
+					('%s', '%s', %d, %d)`, dbRow.Task, dbRow.Description, isDone(dbRow.Done), isHighPriority(dbRow.HighPriority))
+	fmt.Println("Insert command: ", insertCommand)
 	stmt, err := db.Prepare(insertCommand)
 	if err != nil {
 		fmt.Println("Statement cannot be prepared: ", err)
@@ -19,8 +22,24 @@ func InsertData(db *sql.DB, insertCommand string) error {
 	return nil
 }
 
+func isHighPriority(high_priority bool) uint {
+	if high_priority {
+		return 1
+	} else {
+		return 0
+	}
+}
+
+func isDone(done bool) uint {
+	if done {
+		return 0
+	} else {
+		return 1
+	}
+}
+
 func UpdateDescription(db *sql.DB, description string, id uint) error {
-	updateString := fmt.Sprintf(`UPDATE tasks SET description = %s WHERE id = %d`, description, id)
+	updateString := fmt.Sprintf(`UPDATE tasks SET description = '%s' WHERE id = %d`, description, id)
 	stmt, err := db.Prepare(updateString)
 	if err != nil {
 		fmt.Println("Update statement cannot be prepared: ", err)
