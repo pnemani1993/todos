@@ -1,44 +1,21 @@
 package main
 
 import (
-	"fmt"
-	"os"
 	"pnemani1993/todos/dbutils"
 	"pnemani1993/todos/tui"
+
+	"github.com/rivo/tview"
 )
 
 func main() {
-	// tui.InitPage()
-	// tui.InitButtons()
-	tui.GetInitModal()
-	// tui.TryingPages()
-	// trialRun()
+	trialTui()
 	return
 }
 
-func trialRun() {
+func trialTui() {
 	dbConn := dbutils.InitializeDatabase()
 	defer dbConn.Close()
-	for _, row := range dbutils.TRIAL_DATA_ROW {
-		err := dbutils.InsertData(dbConn, row)
-		if err != nil {
-			fmt.Println("Data was not inserted: ", row)
-			// os.Exit(1)
-		}
-	}
-	fmt.Println("Data insertion successful")
-	dbRows, err := dbutils.SelectAll(dbConn)
-	if err != nil {
-		fmt.Println("Data cannot be obtained")
-		os.Exit(1)
-	}
-	for _, row := range dbRows {
-		fmt.Println("Row: ", row)
-	}
-	err = dbutils.DeleteData(dbConn, dbutils.DELETE_ALL_TRIAL)
-	if err != nil {
-		fmt.Println("Data was not deleted")
-		os.Exit(1)
-	}
-	fmt.Println("The trial ended.")
+	data := &dbutils.DbRow{}
+	tuiApp := tui.TuiApp{Sql: dbConn, App: tview.NewApplication(), Pages: tview.NewPages(), NewTaskPage: tview.NewForm(), Data: data}
+	tuiApp.InitApp()
 }

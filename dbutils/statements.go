@@ -19,6 +19,8 @@ const CREATE_TABLE_REMINDER = `CREATE TABLE IF NOT EXISTS tasks (
 const SELECT_NOT_DONE_TASKS = `SELECT * FROM tasks WHERE done = 0;`
 const SELECT_DONE_TASKS = `SELECT * FROM tasks WHERE done = 1;`
 const SELECT_ALL_HIGH_PRIORITY_TASKS string = `SELECT * FROM tasks WHERE high_priority = 1;`
+const SELECT_ALL_STATEMENT string = `SELECT * FROM tasks;`
+
 
 const TRIAL_DATA string = `INSERT INTO tasks (task, description, done, high_priority) VALUES
 ('Task 1', 'Description for task 1', 0, 0),
@@ -35,3 +37,4 @@ const TRIAL_DATA string = `INSERT INTO tasks (task, description, done, high_prio
 const DELETE_ALL_TRIAL string = "DELETE FROM tasks"
 
 const DELETE_TABLE string = "DROP TABLE tasks"
+

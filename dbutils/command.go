@@ -32,14 +32,14 @@ func isHighPriority(high_priority bool) uint {
 
 func isDone(done bool) uint {
 	if done {
-		return 0
-	} else {
 		return 1
+	} else {
+		return 0
 	}
 }
 
-func UpdateDescription(db *sql.DB, description string, id uint) error {
-	updateString := fmt.Sprintf(`UPDATE tasks SET description = '%s' WHERE id = %d`, description, id)
+func UpdateRow(db *sql.DB, dbRow DbRow) error {
+	updateString := fmt.Sprintf(`UPDATE tasks SET description = '%s', done = %d, high_priority = %d  WHERE id = %d`, dbRow.Description, isDone(dbRow.Done), isHighPriority(dbRow.HighPriority), dbRow.Id)
 	stmt, err := db.Prepare(updateString)
 	if err != nil {
 		fmt.Println("Update statement cannot be prepared: ", err)
@@ -98,8 +98,9 @@ func RemoveHighPriority(db *sql.DB, id uint) error {
 	return nil
 }
 
-func DeleteData(db *sql.DB, deleteCommand string) error {
-	stmt, err := db.Prepare(deleteCommand)
+func DeleteData(db *sql.DB, dbRow DbRow) error {
+	delCommand := fmt.Sprintf("Delete from tasks where id = %d", dbRow.Id)
+	stmt, err := db.Prepare(delCommand)
 	if err != nil {
 		fmt.Println("Delete Statement cannot be prepared: ", err)
 		return err
