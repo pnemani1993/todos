@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"pnemani1993/todos/dbutils"
 
+	"time"
+
 	"github.com/rivo/tview"
 )
 
@@ -29,8 +31,8 @@ func (tuiApp *TuiApp) InitApp() {
 func (tuiApp *TuiApp) createNewForm() {
 
 	tuiApp.NewTaskPage.
-		AddTextArea("Task", tuiApp.Data.Task, 30, 0, 0, nil).
-		AddTextArea("Description", tuiApp.Data.Description, 0, 0, 0, nil).
+		AddTextArea("Task", tuiApp.Data.Task, 0, 3, 0, nil).
+		AddTextArea("Description", tuiApp.Data.Description, 0, 15, 0, nil).
 		AddCheckbox("Done", tuiApp.Data.Done, nil).
 		AddCheckbox("High Priority", tuiApp.Data.HighPriority, nil).
 		AddButton("Okay", func() {
@@ -38,6 +40,10 @@ func (tuiApp *TuiApp) createNewForm() {
 			tuiApp.getFormData()
 			tuiApp.displayEnteredForm()
 			// fmt.Println("Test - doing nothing for now...")
+		}).
+		AddButton("Menu", func() {
+			tuiApp.Data = &dbutils.DbRow{}
+			tuiApp.Pages.SwitchToPage("InitPage")
 		}).
 		AddButton("Quit", func() {
 			tuiApp.App.Stop()
@@ -70,11 +76,12 @@ func (tuiApp *TuiApp) initPageSetup() {
 func (tuiApp *TuiApp) displayEnteredForm() {
 	newDisplayPage := tview.NewForm()
 	newDisplayPage.
-		AddTextView("Task", tuiApp.Data.Task, 0, 0, true, true).
-		AddTextView("Description", tuiApp.Data.Description, 0, 0, true, true).
+		AddTextView("Task", tuiApp.Data.Task, 0, 3, true, true).
+		AddTextView("Description", tuiApp.Data.Description, 0, 15, true, true).
 		AddTextView("Done", fmt.Sprintf("%t", tuiApp.Data.Done), 0, 0, true, false).
 		AddTextView("High Priority", fmt.Sprintf("%t", tuiApp.Data.HighPriority), 0, 0, true, false).
 		AddButton("Save", func() {
+			tuiApp.Data.Description = time.Now().Local().String() + "\n" + tuiApp.Data.Description + "\n---"
 			err := dbutils.InsertData(tuiApp.Sql, *tuiApp.Data)
 			if err != nil {
 				tuiApp.errorPage(err)
@@ -172,10 +179,9 @@ func (tuiApp *TuiApp) errorPage(err error) {
 func (tuiApp *TuiApp) selectForm(dbRow dbutils.DbRow) {
 	selectForm := tview.NewForm()
 	selectForm.
-		AddTextView("Task", dbRow.Task, 0, 0, true, true).
-		AddTextArea("Description", dbRow.Description, 0, 0, 0, func(text string) {
-			dbRow.Description = dbRow.Description + text
-		}).
+		AddTextView("Task", dbRow.Task, 0, 3, true, true).
+		AddTextArea("Description", dbRow.Description, 0, 6, 0, nil).
+		AddTextArea("Add Description", "", 0, 8, 0, nil).
 		AddCheckbox("Done", dbRow.Done, func(checkbox bool) {
 			dbRow.Done = checkbox
 		}).
@@ -183,9 +189,11 @@ func (tuiApp *TuiApp) selectForm(dbRow dbutils.DbRow) {
 			dbRow.HighPriority = checkbox
 		}).
 		AddButton("Save", func() {
-			dbRow.Description = selectForm.GetFormItem(1).(*tview.TextArea).GetText()
-			dbRow.Done = selectForm.GetFormItem(2).(*tview.Checkbox).IsChecked()
-			dbRow.HighPriority = selectForm.GetFormItem(3).(*tview.Checkbox).IsChecked()
+			descriptionText := selectForm.GetFormItem(2).(*tview.TextArea).GetText()
+			descriptionText = dbRow.Description + "\n" + time.Now().Local().String() + "\n" + descriptionText + "\n---"
+			dbRow.Description = descriptionText
+			dbRow.Done = selectForm.GetFormItem(3).(*tview.Checkbox).IsChecked()
+			dbRow.HighPriority = selectForm.GetFormItem(4).(*tview.Checkbox).IsChecked()
 			err := dbutils.UpdateRow(tuiApp.Sql, dbRow)
 			if err != nil {
 				tuiApp.errorPage(err)
@@ -207,7 +215,8 @@ func (tuiApp *TuiApp) selectForm(dbRow dbutils.DbRow) {
 		}).
 		AddButton("Quit", func() {
 			tuiApp.App.Stop()
-		})
+		}).SetBorder(true).SetTitle(fmt.Sprintf("Task %d", dbRow.Id)).SetTitleAlign(tview.AlignLeft)
+	selectForm.SetFocus(1)
 	tuiApp.Pages.AddAndSwitchToPage("SelectDataPage", selectForm, true)
 }
 
